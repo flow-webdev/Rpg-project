@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using RPG.Core;
 
 namespace RPG.Combat {
 
-    public class CombatTarget : MonoBehaviour {
-    }
+    [RequireComponent(typeof(Health))] // Will automatically add an Health component (script)
+    public class CombatTarget : MonoBehaviour { }
+    
 }
 
 

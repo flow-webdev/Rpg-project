@@ -2,20 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using RPG.Combat;
+using RPG.Core;
 
 namespace RPG.Movement {
 
-    public class Mover : MonoBehaviour
+    public class Mover : MonoBehaviour, IAction
     {
-        Ray lastRay; //Debug.DrawRay(lastRay.origin, lastRay.direction * 400); //* draw the casted ray
+        //Ray lastRay; //Debug.DrawRay(lastRay.origin, lastRay.direction * 400); //* draw the casted ray
         NavMeshAgent navMeshAgent;
+        Health health;        
 
         private void Start() {
             navMeshAgent = GetComponent<NavMeshAgent>();
+            health = GetComponent<Health>();
         }
 
         private void Update() {
+            navMeshAgent.enabled = !health.GetIsDead();
             UpdateAnimator();            
         }
 
@@ -29,15 +32,15 @@ namespace RPG.Movement {
 
         public void MoveTo(Vector3 destination) { // Movement
             navMeshAgent.destination = destination;
-            navMeshAgent.isStopped = false;            
+            navMeshAgent.isStopped = false;    
         }
 
         public void StartMoveAction(Vector3 destination) { // Action movement
-            GetComponent<Fighter>().Cancel();
+            GetComponent<ActionScheduler>().StartAction(this);
             MoveTo(destination);
         }
 
-        public void Stop() {
+        public void Cancel() {
             navMeshAgent.isStopped = true;
         }
     }

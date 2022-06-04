@@ -3,13 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using RPG.Movement;
 using RPG.Combat;
+using RPG.Core;
 using System;
 
 namespace RPG.Control {
 
     public class PlayerController : MonoBehaviour {
 
+        Health health;
+
+        private void Start() {
+            health = GetComponent<Health>();
+        }
+
         private void Update() {
+            if (health.GetIsDead()) return;
 
             if (InteractWithCombat()) {
                 return;
@@ -24,18 +32,15 @@ namespace RPG.Control {
             RaycastHit[] hits = Physics.RaycastAll(GetMouseRay()); // All the point where the raycast hit are in the array
 
             foreach (RaycastHit hit in hits) {
-
                 CombatTarget target = hit.transform.GetComponent<CombatTarget>(); // check if one of the transform point is a combat target
                 
-                if (target == null) {
-                    continue; // if is not, nothing happens
-                
-                } else {
-                    if (Input.GetMouseButtonDown(0)) { // else if is clicked, call attack method in Fighter
-                        GetComponent<Fighter>().Attack(target);
-                    }
-                    return true;
-                }                                          
+                if (target == null) { continue; }     
+                if (!GetComponent<Fighter>().CanAttack(target.gameObject)) { continue; } // if is hitting terrain or dead enemy, nothing happens
+
+                if (Input.GetMouseButtonDown(0)) { // else if is clicked, call attack method in Fighter
+                    GetComponent<Fighter>().Attack(target.gameObject);
+                }
+                return true;                                                        
             }
             return false;
         }
@@ -48,7 +53,7 @@ namespace RPG.Control {
 
             if (hasHit) { // it found some collider
                 if (Input.GetMouseButton(0)) {
-                    GetComponent<Mover>().StartMoveAction(hitDetails.point);
+                    GetComponent<Mover>().StartMoveAction(hitDetails.point);                
                 }
                 return true;            
             }
