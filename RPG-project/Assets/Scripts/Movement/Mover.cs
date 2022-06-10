@@ -10,7 +10,8 @@ namespace RPG.Movement {
     {
         //Ray lastRay; //Debug.DrawRay(lastRay.origin, lastRay.direction * 400); //* draw the casted ray
         NavMeshAgent navMeshAgent;
-        Health health;        
+        Health health;
+        [SerializeField] float maxSpeed = 6f;
 
         private void Start() {
             navMeshAgent = GetComponent<NavMeshAgent>();
@@ -30,14 +31,15 @@ namespace RPG.Movement {
             GetComponent<Animator>().SetFloat("forwardSpeed", speed); // Set animator blend value to be equal to the desired forward speed (on Z axis)
         }
 
-        public void MoveTo(Vector3 destination) { // Movement
+        public void MoveTo(Vector3 destination,float speedFraction) { // Movement
             navMeshAgent.destination = destination;
+            navMeshAgent.speed = maxSpeed * Mathf.Clamp01(speedFraction);
             navMeshAgent.isStopped = false;    
         }
 
-        public void StartMoveAction(Vector3 destination) { // Action movement
+        public void StartMoveAction(Vector3 destination, float speedFraction) { // Action movement
             GetComponent<ActionScheduler>().StartAction(this);
-            MoveTo(destination);
+            MoveTo(destination, speedFraction);
         }
 
         public void Cancel() {

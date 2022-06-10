@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using RPG.Combat;
 using RPG.Core;
 using RPG.Movement;
-using System;
+using UnityEngine.AI;
 
 namespace RPG.Control {
 
@@ -15,6 +16,8 @@ namespace RPG.Control {
         [SerializeField] PatrolPathScript patrolPath;
         [SerializeField] float waypointTolerance = 1f;
         [SerializeField] float waypointDwellTime = 3f;
+        [Range(0,1)]
+        [SerializeField] float patrolSpeedFraction = 0.25f;
 
         Fighter fighter;
         GameObject player;
@@ -66,8 +69,8 @@ namespace RPG.Control {
                 }
                 nextPosition = GetCurrentWaypoint();
             }
-            if (timeSinceArrivedAtWaypoint > waypointDwellTime) { 
-                mover.StartMoveAction(nextPosition);                
+            if (timeSinceArrivedAtWaypoint > waypointDwellTime) {
+                mover.StartMoveAction(nextPosition, patrolSpeedFraction);
             }
         }
 

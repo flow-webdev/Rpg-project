@@ -24,26 +24,5 @@ namespace RPG.Control {
         public Vector3 GetWaypoint(int i) {
             return transform.GetChild(i).position;
         }
-
-        // public Vector3 GetCurrentWaypoint(Vector3 enemyPosition) {
-        //     int waypointIndex = 0;
-        //     for (int i = 0; i < transform.childCount; i++) {
-        //         int 
-        //     }
-        //     return GetWaypoint(waypointIndex);
-        // }
     }
 }
-
-// private void OnDrawGizmos() {
-//     Vector3 firstPointPosition = new Vector3(0, 0, 0);
-//     for (int i = 0; i < transform.childCount; i++) {
-//         Gizmos.color = Color.red;
-//         if (i == 0) { firstPointPosition = transform.GetChild(i).position; }
-//         if (i == transform.childCount - 1) {
-//             Gizmos.DrawLine(transform.GetChild(i).position, firstPointPosition);
-//             break;
-//         }
-//         Gizmos.DrawLine(transform.GetChild(i).position, transform.GetChild(i + 1).position);
-//     }
-// }

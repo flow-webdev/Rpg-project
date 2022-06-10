@@ -24,7 +24,7 @@ namespace RPG.Control {
             } else if (InteractWithMovement()) {
                 return;
             } else {
-                print("Nothing to do");
+                //print("Nothing to do");
             }       
         }
 
@@ -37,7 +37,7 @@ namespace RPG.Control {
                 if (target == null) { continue; }     
                 if (!GetComponent<Fighter>().CanAttack(target.gameObject)) { continue; } // if is hitting terrain or dead enemy, nothing happens
 
-                if (Input.GetMouseButtonDown(0)) { // else if is clicked, call attack method in Fighter
+                if (Input.GetMouseButtonDown(0)) { // else if clicked, call attack method in Fighter
                     GetComponent<Fighter>().Attack(target.gameObject);
                 }
                 return true;                                                        
@@ -53,7 +53,7 @@ namespace RPG.Control {
 
             if (hasHit) { // it found some collider
                 if (Input.GetMouseButton(0)) {
-                    GetComponent<Mover>().StartMoveAction(hitDetails.point);                
+                    GetComponent<Mover>().StartMoveAction(hitDetails.point, 1f);
                 }
                 return true;            
             }
