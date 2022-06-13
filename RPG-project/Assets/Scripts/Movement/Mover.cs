@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using RPG.Core;
+using RPG.Saving;
 
 namespace RPG.Movement {
 
-    public class Mover : MonoBehaviour, IAction
+    public class Mover : MonoBehaviour, IAction, ISaveable
     {
         //Ray lastRay; //Debug.DrawRay(lastRay.origin, lastRay.direction * 400); //* draw the casted ray
         NavMeshAgent navMeshAgent;
@@ -44,6 +45,28 @@ namespace RPG.Movement {
 
         public void Cancel() {
             navMeshAgent.isStopped = true;
+        }
+
+        public object CaptureState() {
+            //return new SerializableVector3(transform.position);
+
+            //! To return more than one object use Dictionary or Struct
+            Dictionary<string, object> data = new Dictionary<string, object>();
+            data["position"] = new SerializableVector3(transform.position);
+            data["rotation"] = new SerializableVector3(transform.eulerAngles);
+            return data;
+        }
+
+        public void RestoreState(object state) {
+            // If not sure if it is a Vector3, use state as SerializableVector3, but check if is null
+            Dictionary<string, object> data = (Dictionary<string, object>)state; // SerializableVector3
+
+            // Sometimes weird condition with navmeshagent, so disable it and reanable it
+            GetComponent<NavMeshAgent>().enabled = false;
+            transform.position = ((SerializableVector3)data["position"]).ToVector(); 
+            transform.eulerAngles = ((SerializableVector3)data["rotation"]).ToVector(); 
+            // transform.position = position.ToVecto3();
+            GetComponent<NavMeshAgent>().enabled = true;
         }
     }
 }

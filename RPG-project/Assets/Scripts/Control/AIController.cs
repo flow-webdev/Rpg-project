@@ -74,16 +74,16 @@ namespace RPG.Control {
             }
         }
 
-        private bool AtWaypoint() {            
+        private bool AtWaypoint() { //! Patrol        
             float distanceToWaypoint = Vector3.Distance(transform.position, GetCurrentWaypoint());
             return distanceToWaypoint < waypointTolerance;
         }
 
-        private void CycleWaypoint() {
+        private void CycleWaypoint() { //! Patrol 
             curentWaypointIndex = patrolPath.GetNextIndex(curentWaypointIndex);
         }
 
-        private Vector3 GetCurrentWaypoint() {
+        private Vector3 GetCurrentWaypoint() { //! Patrol 
             return patrolPath.GetWaypoint(curentWaypointIndex);
         }
 
