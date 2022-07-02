@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using RPG.Movement;
 using RPG.Combat;
-using RPG.Core;
+using RPG.Attributes;
 using System;
 
 namespace RPG.Control {
@@ -12,7 +12,7 @@ namespace RPG.Control {
 
         Health health;
 
-        private void Start() {
+        private void Awake() {
             health = GetComponent<Health>();
         }
 

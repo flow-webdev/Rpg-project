@@ -1,16 +1,17 @@
 using System;
-using RPG.Core;
+using RPG.Attributes;
 using UnityEngine;
 
 namespace RPG.Combat {
 
-    [CreateAssetMenu(fileName = "Weapon", menuName = "Weapons/Make new Weapon", order = 0)]
+    [CreateAssetMenu(fileName = "Weapon", menuName = "Weapons/new Weapon", order = 0)]
     public class Weapon : ScriptableObject {
 
         [SerializeField] AnimatorOverrideController animatorOverride = null;
         [SerializeField] GameObject equippedPrefab = null;
         [SerializeField] float weaponRange = 1f;
         [SerializeField] float weaponDamage = 5f;
+        [SerializeField] float weaponPercentageBonus = 0;
         [SerializeField] bool isRightHand = true;
         [SerializeField] Projectile projectile = null;
 
@@ -62,9 +63,9 @@ namespace RPG.Combat {
             return projectile != null;
         }
 
-        public void LaunchProjectile(Transform rightHand, Transform leftHand, Health target) {
+        public void LaunchProjectile(Transform rightHand, Transform leftHand, Health target, GameObject instigator, float calculatedDamage) {
             Projectile projectileInstance = Instantiate(projectile, GetTransform(rightHand, leftHand).position, Quaternion.identity);
-            projectileInstance.SetTarget(target, weaponDamage);
+            projectileInstance.SetTarget(target, instigator, calculatedDamage);
         }
 
         public float GetRange() {
@@ -73,6 +74,10 @@ namespace RPG.Combat {
 
         public float GetDamage() {
             return weaponDamage;
+        }
+
+        public float GetPercentageBonus() {
+            return weaponPercentageBonus;
         }
     }
 }

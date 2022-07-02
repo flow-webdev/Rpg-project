@@ -9,6 +9,7 @@ namespace RPG.Combat {
 
         [SerializeField] Weapon weapon = null;
         [SerializeField] float respawnTime = 5f;
+
         private void OnTriggerEnter(Collider other) {
             
             if (other.gameObject.tag == "Player") {
@@ -23,10 +24,10 @@ namespace RPG.Combat {
             ShowPickup(true);
         }
 
-        private void ShowPickup(bool shoulShow) {
-            GetComponent<Collider>().enabled = shoulShow;
+        private void ShowPickup(bool shouldShow) {
+            GetComponent<Collider>().enabled = shouldShow;
             foreach (Transform child in transform) {
-                child.gameObject.SetActive(shoulShow);
+                child.gameObject.SetActive(shouldShow);
             }
         }
     }

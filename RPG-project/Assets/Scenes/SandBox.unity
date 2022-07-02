@@ -1992,6 +1992,10 @@ PrefabInstance:
       propertyPath: defaultWeaponName
       value: Unarmed
       objectReference: {fileID: 0}
+    - target: {fileID: 6117166967609687703, guid: 710006383d9cea14aad58477cbfc5d81, type: 3}
+      propertyPath: startingLevel
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 710006383d9cea14aad58477cbfc5d81, type: 3}
 --- !u!4 &887383951 stripped
