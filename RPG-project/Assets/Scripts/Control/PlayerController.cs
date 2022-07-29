@@ -2,23 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using RPG.Movement;
-using RPG.Combat;
 using RPG.Attributes;
 using System;
 using UnityEngine.EventSystems;
+using UnityEngine.AI;
 
 namespace RPG.Control {
 
     public class PlayerController : MonoBehaviour {
 
-        Health health;
-
-        enum CursorType {
-            None,
-            Movement,
-            Combat,
-            UI
-        }
+        Health health;        
 
         [System.Serializable]
         struct CursorMapping {
@@ -28,13 +21,14 @@ namespace RPG.Control {
         }
 
         [SerializeField] CursorMapping[] cursorMappings = null;
+        [SerializeField] float maxNavMeshProjectionDistance = 1f;        
+        [SerializeField] float raycastRadius = 0.5f;        
 
         private void Awake() {
             health = GetComponent<Health>();
         }
 
         private void Update() {
-
             if (InteractWithUI()) { return; }
             
             if (health.GetIsDead()) {
@@ -57,7 +51,7 @@ namespace RPG.Control {
         }
 
         private bool InteractWithComponent() {
-            RaycastHit[] hits = Physics.RaycastAll(GetMouseRay()); // All the point where the raycast hit are in the array
+            RaycastHit[] hits = RaycastAllSorted(); // All the point where the raycast hit are in the array
 
             foreach (RaycastHit hit in hits) {
                 IRaycastable[] raycastables = hit.transform.GetComponents<IRaycastable>();
@@ -65,7 +59,7 @@ namespace RPG.Control {
                 foreach (IRaycastable raycastable in raycastables) {
 
                     if (raycastable.HandleRaycast(this)) {
-                        SetCursor(CursorType.Combat); 
+                        SetCursor(raycastable.GetCursorType());
                         return true; 
                     }
                 }                
@@ -73,21 +67,60 @@ namespace RPG.Control {
             return false;
         }
 
-        private bool InteractWithMovement() {
+        RaycastHit[] RaycastAllSorted() {
+            RaycastHit[] hits = Physics.SphereCastAll(GetMouseRay(), raycastRadius);
+            float[] distances = new float[hits.Length];            
+            
+            for (int i = 0; i < hits.Length; i++) {
+                distances[i] = hits[i].distance;
+            }
 
-            RaycastHit hitDetails;
-            bool hasHit = Physics.Raycast(GetMouseRay(), out hitDetails); // We store in the out var info (position) on where the raycast hit
-            //! Casts a ray, from point origin, in direction direction, of length maxDistance, against all colliders in the Scene.
+            Array.Sort(distances, hits);
+            return hits;
+        }
+
+        private bool InteractWithMovement() {
+            // RaycastHit hitDetails;
+            // bool hasHit = Physics.Raycast(GetMouseRay(), out hitDetails); // We store in the out var info (position) on where the raycast hit
+
+            Vector3 target;
+            bool hasHit = RaycastNavMesh(out target);
 
             if (hasHit) { // it found some collider
+
+                if (!GetComponent<Mover>().CanMoveTo(target)) { return false; }
+                
                 if (Input.GetMouseButton(0)) {
-                    GetComponent<Mover>().StartMoveAction(hitDetails.point, 1f);
+                    GetComponent<Mover>().StartMoveAction(target, 1f); //hitDetails.point
                 }
                 SetCursor(CursorType.Movement);
                 return true;            
             }
             return false;
         }
+
+        private bool RaycastNavMesh(out Vector3 target) { //! Disable movement if not hovering over a navmesh
+            target = new Vector3();
+            RaycastHit hitDetails;
+            bool hasHit = Physics.Raycast(GetMouseRay(), out hitDetails); // We store in the out var info (position) on where the raycast hit
+            if (!hasHit) { return false; } //! Did not hit anything
+
+            NavMeshHit navMeshHit;
+            bool hasHitNavMesh = NavMesh.SamplePosition(hitDetails.point, out navMeshHit, maxNavMeshProjectionDistance, NavMesh.AllAreas);
+
+            if (!hasHitNavMesh) { return false; } //! Did not hit navMesh
+
+            target = navMeshHit.position;
+
+            //! Spostato in Mover CanMoveTo
+            // NavMeshPath path = new NavMeshPath();
+            // bool hasPath = NavMesh.CalculatePath(transform.position, target, NavMesh.AllAreas, path);
+            // if (!hasPath) { return false; } 
+            // if (path.status != NavMeshPathStatus.PathComplete) { return false; } //! Exclude unreachable routes (top building)
+            // if (GetPathLength(path) > maxNavPathLength) { return false; } //! Exclude routes of more than a certain length
+
+            return hasHitNavMesh;
+        }        
 
         private void SetCursor(CursorType type) {
             CursorMapping mapping = GetCursorMapping(type);

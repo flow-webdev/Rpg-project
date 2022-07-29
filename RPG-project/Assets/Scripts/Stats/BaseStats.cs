@@ -40,7 +40,7 @@ namespace RPG.Stats {
 
         private void OnDisable() {
             if (experience != null) {
-                // Add UpdateLevel to the list of methods on onExperienceGained(). We subscribe to the Event.
+                // Unsubscribe to the Event.
                 experience.onExperienceGained -= UpdateLevel;
             }
         }

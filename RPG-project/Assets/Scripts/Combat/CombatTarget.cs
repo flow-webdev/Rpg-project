@@ -7,7 +7,7 @@ using RPG.Control;
 namespace RPG.Combat {
 
     [RequireComponent(typeof(Health))] // Will automatically add an Health component (script)
-    public class CombatTarget : MonoBehaviour, IRaycastable {
+    public class CombatTarget : MonoBehaviour, IRaycastable {        
 
         public bool HandleRaycast(PlayerController callingController) {
 
@@ -18,6 +18,11 @@ namespace RPG.Combat {
             }
             return true;
         }
+
+        public CursorType GetCursorType() {
+            return CursorType.Combat;
+        }
+        
     }
 
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using RPG.Attributes;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace RPG.Combat {
 
@@ -14,6 +15,7 @@ namespace RPG.Combat {
         [SerializeField] float maxLifeTime = 10f;
         [SerializeField] float lifeAfterImpact = 2f;
         [SerializeField] GameObject[] destroyOnHit = null;
+        [SerializeField] UnityEvent onProjectileHit;
 
         Health target = null;
         GameObject instigator = null;
@@ -52,8 +54,10 @@ namespace RPG.Combat {
             target.TakeDamage(instigator, damage);
 
             speed = 0;
+            onProjectileHit.Invoke();
+            
             if (hitEffect != null) { 
-                Instantiate(hitEffect, GetAimLocation(), transform.rotation); 
+                Instantiate(hitEffect, GetAimLocation(), transform.rotation);                
             }
 
             foreach (GameObject toDestroy in destroyOnHit) { // destroy different GO at different times

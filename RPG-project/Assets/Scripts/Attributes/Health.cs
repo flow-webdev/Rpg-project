@@ -6,12 +6,20 @@ using RPG.Stats;
 using RPG.Core;
 using System;
 using RPG.Utils;
+using UnityEngine.Events;
 
 namespace RPG.Attributes {
 
     public class Health : MonoBehaviour, ISaveable {
 
         [SerializeField] float regenerationPercentage = 70;
+        [SerializeField] TakeDamageEvent takeDamage;
+        [SerializeField] UnityEvent onDie;
+
+        //! Create a subclass of UnityEvent float to be able to pass a value
+        [System.Serializable]
+        public class TakeDamageEvent : UnityEvent<float> {}
+
         LazyValue<float> healthPoints; // Lazy Value wrapper/container makes sure initialization is called just before first use
         private bool isDead = false;
 
@@ -50,10 +58,18 @@ namespace RPG.Attributes {
             print(gameObject.name + " took damage: " + damage);
 
             healthPoints.value = Mathf.Max(healthPoints.value - damage, 0);
+
             if (healthPoints.value == 0) {
                 Die();
-                AwardExperience(instigator);                
+                AwardExperience(instigator);
+                onDie.Invoke();             
+            } else {
+                takeDamage.Invoke(damage);
             }
+        }
+
+        public void Heal(float healthToRestore) {
+            healthPoints.value = Mathf.Min(healthPoints.value + healthToRestore, GetMaxHealthPoints());
         }
 
         public float GetHealthPoints() {
@@ -65,7 +81,11 @@ namespace RPG.Attributes {
         }
 
         public float GetPercentage() {
-            return 100 * (healthPoints.value / baseStats.GetStat(Stat.Health)); 
+            return 100 * GetFraction(); 
+        }
+
+        public float GetFraction() {
+            return healthPoints.value / baseStats.GetStat(Stat.Health);
         }
 
         private void Die() {
@@ -73,7 +93,7 @@ namespace RPG.Attributes {
             
             isDead = true;
             GetComponent<Animator>().SetTrigger("death");
-            GetComponent<ActionScheduler>().CancelCurrentAction();
+            GetComponent<ActionScheduler>().CancelCurrentAction();            
         }
 
         private void AwardExperience(GameObject instigator) {
@@ -92,12 +112,12 @@ namespace RPG.Attributes {
 
         public bool GetIsDead() {
             return this.isDead;
-        }
+        }        
 
 
         // SAVING SYSTEM
         public object CaptureState() {
-            return healthPoints;             
+            return healthPoints.value;
         }
 
         public void RestoreState(object state) {
